@@ -1,6 +1,7 @@
 import logging
 
 from lxml import objectify
+from settings import RESOURCE_TYPE_POSTFIX
 
 
 class VehiclePart():
@@ -14,6 +15,13 @@ class VehiclePart():
         self.encyclopedia = get_attr('VisibleInEncyclopedia', object, False)
         self.loadpoints = get_attr('LoadPoints', object, False)
 
+    def group_defination(self):
+        for element in RESOURCE_TYPE_POSTFIX:
+            if element in self.resource_type:
+                patrition = self.resource_type.rpartition(element)
+                group = patrition[0]
+        return group.capitalize()
+
 class Chassis(VehiclePart):
     def __init__(self, object) -> None:
         super().__init__(object)
@@ -22,6 +30,9 @@ class Chassis(VehiclePart):
         self.braking_sound = get_attr('BrakingSound', object)
         self.pneumo_sound = get_attr('PneumoSound', object)
         self.gear_shift_sound = get_attr('GearShiftSound', object)
+
+    def type_defination(self):
+        return 'ResourceChassis'
 
 class Cabin(VehiclePart):
     def __init__(self, object) -> None:
@@ -37,6 +48,9 @@ class Cabin(VehiclePart):
         self.blow_effect = get_attr('BlowEffect', object)
         self.fuel_consumption = get_attr('FuelConsumption', object, False)
 
+    def type_defination(self):
+        return 'ResourceCabin'
+
 class Cargo(VehiclePart):
     def __init__(self, object) -> None:
         super().__init__(object)
@@ -45,6 +59,9 @@ class Cargo(VehiclePart):
         self.blow_effect = get_attr('BlowEffect', object)
         self.price = get_attr('Price', object)
         self.repair_coef = get_attr('RepairCoef', object)
+
+    def type_defination(self):
+        return 'ResourceCargo'
 
 class Wheel(VehiclePart):
     def __init__(self, object) -> None:
@@ -55,6 +72,14 @@ class Wheel(VehiclePart):
         self.suspension_range = get_attr('SuspensionRange', object)
         self.mu = get_attr('mU', object)
         self.effect_type = get_attr('EffectType', object)
+
+    def type_defination(self):
+        return 'ResourceWheel'
+
+    def group_defination(self):
+        patrition = self.name.rpartition('Wheel')
+        print(patrition[0].capitalize())
+        return patrition[0].capitalize()
 
 
 def get_attr(attr: str, prototype: objectify.ObjectifiedElement, importantly: bool = True):

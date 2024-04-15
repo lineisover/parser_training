@@ -2,19 +2,8 @@ import json
 import logging
 from pathlib import PurePath
 
+from parts import VehiclePart
 from settings import DEFAULT_BENDING, DEFAULT_MASS, OUTPUT_FILE, PATH_TO_MODELS
-
-
-def type_defination(cls):
-    match cls:
-        case 'Chassis':
-            return 'ResourceChassis'
-        case 'Cabin':
-            return 'ResourceCabin'
-        case 'Basket':
-            return 'ResourceCargo'
-        case 'Wheel':
-            return 'ResourceWheel'
 
 
 # TODO: Нужно как то определять имя папки ^o^
@@ -44,13 +33,13 @@ def bending_defination(cls):
             return None
 
 
-def convert_to_json(prototypes: list):
+def convert_to_json(prototypes: list[VehiclePart]):
     logging.info(f'Обнаружено {len(prototypes)} прототипов.')
     json_parts = []
     for prototype in prototypes:
-        part = {'type': type_defination(prototype.cls),
+        part = {'type': prototype.type_defination(),
                 'token': prototype.name,
-                'group': prototype.resource_type,
+                'group': prototype.group_defination(),
                 'model': convert_model_path(prototype.model_file),
                 'weight': weight_defination(prototype.mass),
                 'bending': bending_defination(prototype.cls)}
