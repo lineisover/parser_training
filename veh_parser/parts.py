@@ -1,4 +1,6 @@
-from utils import get_attr
+import logging
+
+from lxml import objectify
 
 
 class VehiclePart():
@@ -6,11 +8,11 @@ class VehiclePart():
         self.cls = get_attr('Class', object)
         self.name = get_attr('Name', object)
         self.model_file = get_attr('ModelFile', object)
-        self.resource_type = get_attr('ResourceType', object)
+        self.resource_type = get_attr('ResourceType', object, False)
         self.node_scale = get_attr('NodeScale', object)
         self.mass = get_attr('Mass', object)
         self.encyclopedia = get_attr('VisibleInEncyclopedia', object, False)
-        self.loadpoints = get_attr('LoadPoints', object)
+        self.loadpoints = get_attr('LoadPoints', object, False)
 
 class Chassis(VehiclePart):
     def __init__(self, object) -> None:
@@ -30,10 +32,10 @@ class Cabin(VehiclePart):
         self.max_torque = get_attr('MaxTorque', object)
         self.engine_high_sound = get_attr('EngineHighSound', object)
         self.price = get_attr('Price', object)
-        self.repair_coef = get_attr('RepairCoef', object)
+        self.repair_coef = get_attr('RepairCoef', object, False)
         self.max_speed = get_attr('MaxSpeed', object)
         self.blow_effect = get_attr('BlowEffect', object)
-        self.fuel_consumption = get_attr('FuelConsumption', object)
+        self.fuel_consumption = get_attr('FuelConsumption', object, False)
 
 class Cargo(VehiclePart):
     def __init__(self, object) -> None:
@@ -54,3 +56,11 @@ class Wheel(VehiclePart):
         self.mu = get_attr('mU', object)
         self.effect_type = get_attr('EffectType', object)
 
+
+def get_attr(attr: str, prototype: objectify.ObjectifiedElement, importantly: bool = True):
+    parse = prototype.get(attr)
+    if not parse and not importantly:
+        logging.debug(f'Атрибут {attr} может существовать, но не обнаружен в {prototype.get('Name')}')
+    elif not parse and importantly:
+        logging.warning(f'Атрибут {attr} должен существовать, но не обнаружен в {prototype.get('Name')}')
+    return parse

@@ -2,6 +2,7 @@ import logging
 from pathlib import Path, PurePath
 
 from lxml import objectify
+from parts import Cabin, Cargo, Chassis, Wheel
 from settings import ENCODING, GAME_PATH
 
 
@@ -18,8 +19,28 @@ def load_xml(file_dir: Path):
     except Exception as e:
         logging.error('Ошибка при загрузке XML файла: %s', str(e))
 
-def get_attr(attr: str, prototype: objectify.ObjectifiedElement, importantly: bool = True):
-    parse = prototype.get(attr)
-    if not parse and importantly:
-        logging.warning(f'Атрибут {attr} должен существовать, но не обнаружен в {prototype.get('Name')}')
-    return parse
+def identify_class(class_name: str, object):
+    if class_name == 'Chassis':
+        return Chassis(object)
+    elif class_name == 'Cabin':
+        return Cabin(object)
+    elif class_name == 'Basket':
+        return Cargo(object)
+    elif class_name == 'Wheel':
+        return Wheel(object)
+
+
+def parse_object(object, prototypes_list) -> list:
+    part_classes = ['Chassis', 'Cabin', 'Basket', 'Wheel']
+    for folder in object.iterchildren():
+        print(folder.get('Name'))
+        for prototype in folder.iterchildren():
+            print(prototype.get('Name'))
+            logging.info(f'Загружает прототип: {prototype.get('Name')}')
+            if prototype.get('Class') in part_classes:
+                part = identify_class(prototype.get('Class'), prototype)
+                prototypes_list.append(part)
+                logging.info(f'Class: {part.cls} Name: {part.name} - Загружен.')
+            else:
+                logging.warning(f'{prototype.get('Class')} - Неподходящий класс')
+    logging.info('Обработка завершена.')
