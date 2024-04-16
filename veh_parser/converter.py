@@ -1,48 +1,26 @@
 import json
 import logging
-from pathlib import PurePath
 
 from parts import VehiclePart
-from settings import DEFAULT_BENDING, DEFAULT_MASS, OUTPUT_FILE, PATH_TO_MODELS
+from settings import OUTPUT_FILE
 
 
-# TODO: Нужно как то определять имя папки ^o^
-def convert_model_path(path: str):
-    new_filename = PurePath(path).with_suffix('.glb')
-    new_path = PATH_TO_MODELS / new_filename
-    new_path_str = str(new_path).replace('\\', '/')
-    return new_path_str
-
-
-def weight_defination(mass):
-    if not mass:
-        return DEFAULT_MASS
-    else:
-        return float(mass)
-
-
-def bending_defination(cls):
-    match cls:
-        case 'Chassis':
-            return DEFAULT_BENDING.get('Chassis')
-        case 'Cabin':
-            return DEFAULT_BENDING.get('Cabin')
-        case 'Basket':
-            return DEFAULT_BENDING.get('Cargo')
-        case 'Wheel':
-            return None
-
-
-def convert_to_json(prototypes: list[VehiclePart]):
+def convert_to_json(prototypes: list[VehiclePart], animmodels):
     logging.info(f'Обнаружено {len(prototypes)} прототипов.')
     json_parts = []
+    logging.info('Начинаем подготовку прототипов к экспорту.')
     for prototype in prototypes:
-        part = {'type': prototype.type_defination(),
-                'token': prototype.name,
-                'group': prototype.group_defination(),
-                'model': convert_model_path(prototype.model_file),
-                'weight': weight_defination(prototype.mass),
-                'bending': bending_defination(prototype.cls)}
+        try:
+            part = {'type': prototype.type_defination(),
+                    'token': prototype.name,
+                    'group': prototype.group_defination(),
+                    'model': prototype.convert_model_path(animmodels),
+                    'weight': prototype.weight_defination(),
+                    'bending': prototype.bending_defination()}
+        except Exception as e:
+            logging.error(f'Ошибка при обработке прототипа {prototype.name}: {e}')
+            raise
         json_parts.append(part)
+        logging.info(f'Прототип {prototype.name} готов.')
     with open(OUTPUT_FILE, 'w') as json_file:
         json.dump(json_parts, json_file, indent=4)

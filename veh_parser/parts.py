@@ -1,7 +1,8 @@
 import logging
+from pathlib import PurePath
 
 from lxml import objectify
-from settings import RESOURCE_TYPE_POSTFIX
+from settings import DEFAULT_BENDING, MASS_FACTOR, RESOURCE_TYPE_POSTFIX
 
 
 class VehiclePart():
@@ -22,6 +23,22 @@ class VehiclePart():
                 group = patrition[0]
         return group.capitalize()
 
+    def convert_model_path(self, animmodels):
+        models = animmodels.iterchildren()
+        for elem in models:
+            if elem.get('id') == self.model_file:
+                model_path = elem.get('file')
+                break
+        new_filename = PurePath(model_path).with_suffix('.glb')
+        new_path_str = str(new_filename).replace('\\', '/').lower()
+        return new_path_str
+
+    def weight_defination(self):
+        mass = float(self.mass) * MASS_FACTOR.get(self.cls, 1)
+        return mass
+
+    def bending_defination(self):
+        return DEFAULT_BENDING.get(self.cls, [0, 0, 0])
 class Chassis(VehiclePart):
     def __init__(self, object) -> None:
         super().__init__(object)
@@ -63,6 +80,7 @@ class Cargo(VehiclePart):
     def type_defination(self):
         return 'ResourceCargo'
 
+
 class Wheel(VehiclePart):
     def __init__(self, object) -> None:
         super().__init__(object)
@@ -78,7 +96,6 @@ class Wheel(VehiclePart):
 
     def group_defination(self):
         patrition = self.name.rpartition('Wheel')
-        print(patrition[0].capitalize())
         return patrition[0].capitalize()
 
 

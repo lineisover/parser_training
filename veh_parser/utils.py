@@ -33,9 +33,7 @@ def identify_class(class_name: str, object):
 def parse_object(object, prototypes_list) -> list:
     part_classes = ['Chassis', 'Cabin', 'Basket', 'Wheel']
     for folder in object.iterchildren():
-        print(folder.get('Name'))
         for prototype in folder.iterchildren():
-            print(prototype.get('Name'))
             logging.info(f'Загружает прототип: {prototype.get('Name')}')
             if prototype.get('Class') in part_classes:
                 part = identify_class(prototype.get('Class'), prototype)
