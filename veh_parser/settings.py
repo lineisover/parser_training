@@ -18,6 +18,16 @@ DEFAULT_BENDING = {'Chassis': [5.0, 5.0, 5.0],
                    'Basket': [5.0, 0.0, 5.0],
                    'Wheel': 'Unavailable'}
 
+DEFAULT_STIFFNESS = {'Chassis': 10,
+                   'Cabin': 3,
+                   'Basket': 3,
+                   'Wheel': 'Unavailable'}
+
+DEFAULT_MASS_CENTER = {'Chassis': [0.0, -1.0, 0.0],
+                       'Cabin': [0.0, 0.0, 0.0],
+                       'Basket': [0.0, 0.0, 0.0],
+                       'Wheel': [0.0, 0.0, 0.0]}
+
 RESOURCE_TYPE_POSTFIX = {'_CHASSIS',
                          '_TRAILER',
                          '_CABIN',

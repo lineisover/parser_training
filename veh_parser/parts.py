@@ -2,7 +2,7 @@ import logging
 from pathlib import PurePath
 
 from lxml import objectify
-from settings import DEFAULT_BENDING, MASS_FACTOR, RESOURCE_TYPE_POSTFIX
+from settings import DEFAULT_BENDING, DEFAULT_MASS_CENTER, DEFAULT_STIFFNESS, MASS_FACTOR, RESOURCE_TYPE_POSTFIX
 
 
 class VehiclePart():
@@ -39,6 +39,25 @@ class VehiclePart():
 
     def bending_defination(self):
         return DEFAULT_BENDING.get(self.cls, [0, 0, 0])
+
+    def stiffness_defination(self):
+        return DEFAULT_STIFFNESS.get(self.cls, 10)
+
+    def mass_center_defination(self):
+        return DEFAULT_MASS_CENTER.get(self.cls, [0.0, 0.0, 0.0])
+
+    def skin_defination(self):
+        return 0
+
+    def is_power(self):
+        return 'Unavailable'
+
+    def is_steer(self):
+        return 'Unavailable'
+
+    def is_brake(self):
+        return 'Unavailable'
+
 class Chassis(VehiclePart):
     def __init__(self, object) -> None:
         super().__init__(object)
@@ -98,6 +117,17 @@ class Wheel(VehiclePart):
         patrition = self.name.rpartition('Wheel')
         return patrition[0].capitalize()
 
+    def stiffness_defination(self):
+        return 'Unavailable'
+
+    def is_power(self):
+        return True
+
+    def is_steer(self):
+        return 'Unavailable'  # TODO: Черт знает как определить...
+
+    def is_brake(self):
+        return True
 
 def get_attr(attr: str, prototype: objectify.ObjectifiedElement, importantly: bool = True):
     parse = prototype.get(attr)
